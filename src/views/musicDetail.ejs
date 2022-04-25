@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= musica.title %> </title>
+    <link rel='stylesheet' href='/css/style.css' />
+
+</head>
+<body>
+    <figure>
+        <img src="/img/logo-DH.png" alt="Logo Digital House">
+    </figure>
+    <h1><%= musica.title %> </h1>    
+    <br>
+    <p>CALIFICACIÓN: <%= music.rating %> </p>
+    <p>PREMIOS: <%= music.awards %> </p>
+    <p>DURACIÓN: <%= music.length + ' min'%> </p>
+    <p>FECHA DE CREACIÓN: <%= music.release_date %> </p>
+    <br>
+    <section>
+        <a class="botonModificar" href="/music/edit/<%= movie.id %>">Modificar</a>
+        <a class="botonBorrar" href="/music/delete/<%= movie.id %>">Borrar</a>
+        <a class="botonVolver" href="/music">Listado de Películas</a>
+    </section>
+
+</body>
+</html>

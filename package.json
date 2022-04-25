@@ -4,15 +4,26 @@
   "description": "_Esta base de datos está compuesta por las siguientes tablas_\r - Artistas\r - Canciones\r - Albumes\r - Generos",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "crud": "0.0.28",
     "express": "^4.17.3",
+    "express-validator": "^6.14.0",
+    "method-override": "^3.0.0",
+    "multer": "^1.4.4",
     "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
     "node": "^17.7.2",
-    "nodejs": "0.0.0"
+    "nodejs": "0.0.0",
+    "sequelize": "^6.19.0",
+    "sequelize-cli": "^6.4.1",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }

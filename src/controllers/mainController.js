@@ -1,18 +1,30 @@
 const fs = require('fs');
 const path = require('path');
-const jsonTable = require('../database/jsonTable');
+const jsonTable = require('../data/musicando.sql');
 
-const groupsModel = jsonTable('groups');
+const groupsModel = jsonTable('music');
+
+const { spawnSync } = require('child_process');
+    
+function files(command, arg, path) {
+    const ls = spawnSync(command, [arg, path], { encoding: 'utf8' });
+    return ls.stdout;
+};
+
+
+var ej = files("___dirname", "", '/data/musicando.sql');
+console.log("eje => " + ej);
+
 
 module.exports = {
     index: (req, res) => {
 
         let groups = groupsModel.all()
 
-        res.render('groups/index',  { groups });
+        res.render('./app.js',  { groups });
     },
     create: (req, res) => {
-        res.render('groups/create');
+        res.render('music/create');
     },
     store: (req, res) => {
 
@@ -20,13 +32,13 @@ module.exports = {
 
         groupId = groupsModel.create(group);
 
-        res.redirect('/groups/' + groupId);
+        res.redirect('/data/musicando.sql' + groupId);
     },
     edit: (req, res) => {
         let group = groupsModel.find(req.params.id)
         let categories = categoriesModel.all();
 
-        res.render('groups/edit', { group, categories });
+        res.render('/data/musicando.sql/edit', { group, categories });
     },
     update: (req, res) => {
         let group = req.body;
@@ -35,17 +47,17 @@ module.exports = {
 
         groupId = groupsModel.update(group);
 
-        res.redirect('/groups/' + groupId)
+        res.redirect('/data/musicando.sql' + groupId)
     },
     show: (req, res) => {
         let group = groupsModel.find(req.params.id);
 
-        res.render('groups/detail', { group });
+        res.render('/data/musicando.sql/detail', { group });
     },
     destroy: (req, res) => {
 
         let group = groupsModel.find(req.params.id);
-        let imagePath = path.join(__dirname, '../public/img/groups/' + group.image);
+        let imagePath = path.join(__dirname, '../public/img/' + group.image);
         
         groupsModel.delete(req.params.id);
 
@@ -53,7 +65,7 @@ module.exports = {
             fs.unlinkSync(imagePath)
         }
 
-        res.redirect('/groups')
+        res.redirect('/data/musicando.sql')
     },
     search: (req, res) => {
         
@@ -63,6 +75,6 @@ module.exports = {
 
         // Envío los grupos y lo que busco el usuario a la vista
 
-        res.render('groups/search', {});
+        res.render('/data/musicando.sql/search', {});
     },
 }

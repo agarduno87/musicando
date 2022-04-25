@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Musica</title>
+    <link rel='stylesheet' href='/css/style.css' />
+
+</head>
+
+<body>
+    <figure>
+        <img src="/img/logo-DH.png" alt="Logo Digital House">
+    </figure>
+    <h1>LISTADO DE MUSICA</h1>
+    <br>
+    <p>
+        <a class="botonAgregar" href="/music/add">Agregar una Musica</a>
+        <a class="botonVolver" href="/">inicio</a>
+
+    </p>
+    <br>
+    <div class="buscar-titulo">
+        <form action="/music/buscar" method="POST">
+            <input type="text" name="titulo" id="titulo">
+            <button class="boton-buscar" type="submit">Buscar una Musica</button>
+        </form>
+        
+    </div>
+    <ul>
+        <% for( let i = 0; i < music.length; i++ ) { %>
+        <li>
+            <a href="/music/detail/<%= music[i].id %>"><%= music[i].title %></a>
+        </li>
+        <% } %>
+
+    </ul>
+</body>
+
+</html>
