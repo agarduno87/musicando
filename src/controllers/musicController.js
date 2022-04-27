@@ -10,6 +10,7 @@ const fetch = require('node-fetch');
 const Canciones = db.Cancion;
 const Genres = db.Genre;
 const Artistas = db.Artista;
+const Albumes = db.Album;
 //const API = 'http://www.omdbapi.com/?apikey=d4e35e92';
 
 const musicController = {
