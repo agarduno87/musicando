@@ -11,7 +11,7 @@ const Canciones = db.Cancion;
 const Genres = db.Genre;
 const Artistas = db.Artista;
 const Albumes = db.Album;
-//const API = 'http://www.omdbapi.com/?apikey=d4e35e92';
+//const API = 'http://www.omdbapi.com/?apikey=5fc0b961';
 
 const musicController = {
     'list': (req, res) => {
