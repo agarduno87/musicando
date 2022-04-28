@@ -1,80 +1,138 @@
-const fs = require('fs');
 const path = require('path');
-const jsonTable = require('../data/musicando.sql');
-
-const groupsModel = jsonTable('music');
-
-const { spawnSync } = require('child_process');
-    
-function files(command, arg, path) {
-    const ls = spawnSync(command, [arg, path], { encoding: 'utf8' });
-    return ls.stdout;
-};
+const db = require('../database/models');
+const sequelize = db.sequelize;
+const { Op } = require("sequelize");
+const moment = require('moment');
+const fetch = require('node-fetch');
 
 
-var ej = files("___dirname", "", '/data/musicando.sql');
-console.log("eje => " + ej);
+//Aqui tienen otra forma de llamar a cada uno de los modelos
+const Canciones = db.Cancion;
+const Genres = db.Genre;
+const Artistas = db.Artista;
+//const API = 'http://www.omdbapi.com/?apikey=5fc0b961';
 
-
-module.exports = {
-    index: (req, res) => {
-
-        let groups = groupsModel.all()
-
-        res.render('./app.js',  { groups });
+const moviesController = {
+    'list': (req, res) => {
+        db.Movie.findAll({
+            include: ['genre']
+        })
+            .then(movies => {
+                res.render('moviesList.ejs', {movies})
+            })
     },
-    create: (req, res) => {
-        res.render('music/create');
+    'detail': (req, res) => {
+        db.Movie.findByPk(req.params.id,
+            {
+                include : ['genre']
+            })
+            .then(movie => {
+                res.render('moviesDetail.ejs', {movie});
+            });
     },
-    store: (req, res) => {
-
-        let group = req.body;
-
-        groupId = groupsModel.create(group);
-
-        res.redirect('/data/musicando.sql' + groupId);
+    'new': (req, res) => {
+        db.Movie.findAll({
+            order : [
+                ['release_date', 'DESC']
+            ],
+            limit: 5
+        })
+            .then(movies => {
+                res.render('newestMovies', {movies});
+            });
     },
-    edit: (req, res) => {
-        let group = groupsModel.find(req.params.id)
-        let categories = categoriesModel.all();
-
-        res.render('/data/musicando.sql/edit', { group, categories });
+    'recomended': (req, res) => {
+        db.Movie.findAll({
+            include: ['genre'],
+            where: {
+                rating: {[db.Sequelize.Op.gte] : 8}
+            },
+            order: [
+                ['rating', 'DESC']
+            ]
+        })
+            .then(movies => {
+                res.render('recommendedMovies.ejs', {movies});
+            });
     },
-    update: (req, res) => {
-        let group = req.body;
-
-        group.id = req.params.id;
-
-        groupId = groupsModel.update(group);
-
-        res.redirect('/data/musicando.sql' + groupId)
-    },
-    show: (req, res) => {
-        let group = groupsModel.find(req.params.id);
-
-        res.render('/data/musicando.sql/detail', { group });
-    },
-    destroy: (req, res) => {
-
-        let group = groupsModel.find(req.params.id);
-        let imagePath = path.join(__dirname, '../public/img/' + group.image);
+    //Aqui debo modificar para crear la funcionalidad requerida
+    'buscar': (req, res) => {
         
-        groupsModel.delete(req.params.id);
-
-        if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath)
-        }
-
-        res.redirect('/data/musicando.sql')
     },
-    search: (req, res) => {
+    //Aqui dispongo las rutas para trabajar con el CRUD
+    add: function (req, res) {
+        let promGenres = Genres.findAll();
+        let promActors = Actors.findAll();
         
-        // Traigo todos los grupos
-
-        // Filtro los grupos
-
-        // Envío los grupos y lo que busco el usuario a la vista
-
-        res.render('/data/musicando.sql/search', {});
+        Promise
+        .all([promGenres, promActors])
+        .then(([allGenres, allActors]) => {
+            return res.render(path.resolve(__dirname, '..', 'views',  'moviesAdd'), {allGenres,allActors})})
+        .catch(error => res.send(error))
     },
+    create: function (req,res) {
+        Movies
+        .create(
+            {
+                title: req.body.title,
+                rating: req.body.rating,
+                awards: req.body.awards,
+                release_date: req.body.release_date,
+                length: req.body.length,
+                genre_id: req.body.genre_id
+            }
+        )
+        .then(()=> {
+            return res.redirect('/movies')})            
+        .catch(error => res.send(error))
+    },
+    edit: function(req,res) {
+        let movieId = req.params.id;
+        let promMovies = Movies.findByPk(movieId,{include: ['genre','actors']});
+        let promGenres = Genres.findAll();
+        let promActors = Actors.findAll();
+        Promise
+        .all([promMovies, promGenres, promActors])
+        .then(([Movie, allGenres, allActors]) => {
+            Movie.release_date = moment(Movie.release_date).format('L');
+            return res.render(path.resolve(__dirname, '..', 'views',  'moviesEdit'), {Movie,allGenres,allActors})})
+        .catch(error => res.send(error))
+    },
+    update: function (req,res) {
+        let movieId = req.params.id;
+        Movies
+        .update(
+            {
+                title: req.body.title,
+                rating: req.body.rating,
+                awards: req.body.awards,
+                release_date: req.body.release_date,
+                length: req.body.length,
+                genre_id: req.body.genre_id
+            },
+            {
+                where: {id: movieId}
+            })
+        .then(()=> {
+            return res.redirect('/movies')})            
+        .catch(error => res.send(error))
+    },
+    delete: function (req,res) {
+        let movieId = req.params.id;
+        Movies
+        .findByPk(movieId)
+        .then(Movie => {
+            return res.render(path.resolve(__dirname, '..', 'views',  'moviesDelete'), {Movie})})
+        .catch(error => res.send(error))
+    },
+    destroy: function (req,res) {
+        let movieId = req.params.id;
+        Movies
+        .destroy({where: {id: movieId}, force: true}) // force: true es para asegurar que se ejecute la acción
+        .then(()=>{
+            return res.redirect('/movies')})
+        .catch(error => res.send(error)) 
+    }
 }
+
+module.exports = moviesController;
