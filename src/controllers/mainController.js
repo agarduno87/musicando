@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const jsonTable = require('../data/musicando.sql');
+const jsonTable = require('../data/musicando.json');
 
 const groupsModel = jsonTable('music');
 
@@ -12,7 +12,7 @@ function files(command, arg, path) {
 };
 
 
-var ej = files("___dirname", "", '/data/musicando.sql');
+var ej = files("___dirname", "", '/data/musicando.json');
 console.log("eje => " + ej);
 
 
@@ -32,13 +32,13 @@ module.exports = {
 
         groupId = groupsModel.create(group);
 
-        res.redirect('/data/musicando.sql' + groupId);
+        res.redirect('/data/musicando.json' + groupId);
     },
     edit: (req, res) => {
         let group = groupsModel.find(req.params.id)
         let categories = categoriesModel.all();
 
-        res.render('/data/musicando.sql/edit', { group, categories });
+        res.render('/data/musicando.json/edit', { group, categories });
     },
     update: (req, res) => {
         let group = req.body;
@@ -47,12 +47,12 @@ module.exports = {
 
         groupId = groupsModel.update(group);
 
-        res.redirect('/data/musicando.sql' + groupId)
+        res.redirect('/data/musicando.json' + groupId)
     },
     show: (req, res) => {
         let group = groupsModel.find(req.params.id);
 
-        res.render('/data/musicando.sql/detail', { group });
+        res.render('/data/musicando.json/detail', { group });
     },
     destroy: (req, res) => {
 
@@ -65,7 +65,7 @@ module.exports = {
             fs.unlinkSync(imagePath)
         }
 
-        res.redirect('/data/musicando.sql')
+        res.redirect('/data/musicando.json')
     },
     search: (req, res) => {
         
@@ -75,6 +75,12 @@ module.exports = {
 
         // Envío los grupos y lo que busco el usuario a la vista
 
-        res.render('/data/musicando.sql/search', {});
+        res.render('/data/musicando.json/search', {});
     },
-}
+}*
+
+
+
+
+
+
